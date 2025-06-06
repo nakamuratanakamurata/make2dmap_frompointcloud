@@ -62,9 +62,9 @@ https://downloads.rapidlasso.de/html/e572las_README.html
    - LASファイルを読み込み (サブサンプリングした点群がよいかと)
    - 床面と思われる部分の点をピックアップ
    - 床面のZ座標の相場を把握
-![Image](https://github.com/user-attachments/assets/5a3183fe-d9b2-4cf4-8786-9a7fff9b0ff0)
+![Image](https://github.com/user-attachments/assets/c61da330-5f68-46cc-a6c0-16757d92cc18)
 
-![Image](https://github.com/user-attachments/assets/027f1664-ab62-4d54-851e-f2a10a65548f)
+![Image](https://github.com/user-attachments/assets/bab417bd-597b-4bb8-ac32-becfed3755f8)
 
 2. **床面高さの決定**
    - 例：1階 z = 0.02m程度
