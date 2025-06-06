@@ -46,11 +46,13 @@ https://rapidlasso.de/downloads/
 https://downloads.rapidlasso.de/html/e572las_README.html
 
 
-2. **サブサンプリング**（大規模データの場合）
+2. **サブサンプリング**（大規模データの場合、必要であれば）
    ```bash
-   las2las -i input.las -o output_sampled.las -keep_random_fraction 0.01
+   CloudCompare -SILENT -O input.las -SS RANDOM 0.01 -SAVE_CLOUDS FILE output.las
    ```
    - 0.01 = 1/100にサンプリング（22GB → 500MB程度）
+   - (GUIで開くと、重い点群だとPCスペックによって大変)
+   - (環境変数の設定でパスを通すのをお忘れなく(してない場合))
 
 ## 4. 処理手順
 
