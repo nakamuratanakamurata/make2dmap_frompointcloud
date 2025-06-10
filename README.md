@@ -47,9 +47,13 @@ https://downloads.rapidlasso.de/html/e572las_README.html
 
 
 2. **サブサンプリング**（大規模データの場合、必要であれば）
-   例として cloud compare CLI を使用した場合のコマンド
+   *例）cloud compare CLI を使用した場合のコマンド
    ```bash
    CloudCompare -SILENT -O input.las -SS RANDOM 0.01 -SAVE_CLOUDS FILE output.las
+   ```
+   *　例）PDALを使用した場合のコマンド
+   ```bash
+   pdal translate input.las output.las --filters.sample.radius=1 --filters.sample.count=1
    ```
    - 0.01 = 1/100にサンプリング（22GB → 500MB程度）
    - (GUIで開くと、重い点群だとPCスペックによって大変)
