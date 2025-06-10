@@ -47,6 +47,7 @@ https://downloads.rapidlasso.de/html/e572las_README.html
 
 
 2. **サブサンプリング**（大規模データの場合、必要であれば）
+   例として cloud compare CLI を使用した場合のコマンド
    ```bash
    CloudCompare -SILENT -O input.las -SS RANDOM 0.01 -SAVE_CLOUDS FILE output.las
    ```
