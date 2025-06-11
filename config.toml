@@ -1,0 +1,59 @@
+[general]
+# 全プログラム共通設定
+pixel_size = 0.05
+background_color = "white"
+output_format = "png"
+
+[input_files]
+# 全プログラム共通の入力ファイルパス
+input_file = "data/sample.txt"  # txtファイルでもlasファイルでも共通
+
+[output_files]
+# 各プログラムの出力ファイル名設定
+point2png_output = "output.png"
+point2png_over_threshold_output = "output_threshold.png"
+point2png_count_output = "output_count.png"
+clip_output = "output_clipped"  # 拡張子は入力ファイルと同じになります
+
+[clip]
+# clip.py専用設定
+z_min = 4.8
+z_max = 5.1
+z_column = 2  # Z座標の列番号（0から開始）
+
+[data_format]
+# 全プログラム共通: 空白区切りファイル
+delimiter = "space"
+coordinate_columns = 3  # x, y, z の3列（zは無視、txt2png.pyではx,yのみ使用）
+
+[colors]
+# 全プログラム共通
+point_color = [0, 0, 0]  # 黒色 (R,G,B)
+
+
+
+# txt2png_over_threshold.py / las2png_over_threshold.py専用: 閾値による色分け
+threshold_count = 20
+below_threshold_color = [255, 255, 255]  # 白色
+above_threshold_color = [0, 0, 0]        # 黒色
+
+
+
+# txt2png_count.py / las2png_count.py専用: カウント範囲による色分け
+count_range_1_max = 5
+count_range_1_color = [255, 0, 0]    # 赤色
+
+count_range_2_min = 5
+count_range_2_max = 10
+count_range_2_color = [0, 0, 255]    # 青色
+
+count_range_3_min = 10
+count_range_3_max = 20
+count_range_3_color = [0, 255, 0]    # 緑色
+
+count_range_4_min = 20
+count_range_4_max = 30
+count_range_4_color = [100, 0, 100]  # 紫色
+
+count_range_5_min = 30
+count_range_5_color = [0, 0, 0]      # 黒色
