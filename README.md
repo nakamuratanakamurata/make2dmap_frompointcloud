@@ -23,7 +23,7 @@ https://rapidlasso.de/downloads/
 - **画像編集ソフト**：手動編集用（Photoshop、AffinityDesigner等）
 
 ### 2.2 python関連
-- **Python要件：Python 3.11以降推奨（tomllib標準ライブラリのため）
+- **Python要件**：Python 3.11以降推奨（tomllib標準ライブラリのため）
 - **インストールするライブラリ**：
    ```bash
    pip install numpy pandas pillow laspy
@@ -86,20 +86,21 @@ e57形式を想定してドキュメントを書きます。
    # las2lasの例
    las2las -i input.las -o output_clipped.las -keep_z 0.2 0.4
    ```
+
 ## 5. 処理3 2次元画像への投影
 以下の3つのプログラムの出力をそれぞれ参照しながら2Dマップを作成すると良いかと思います。
 
-1. **基本的な投影処理**（txt2png.py）
+1. **基本的な投影処理**（point2png.py）
    - 点群のX,Y座標を画像のピクセル座標に変換
    - ピクセルサイズ：0.05m（5cm）を推奨
    - 白背景に黒点として描画
 
-2. **ノイズ除去を含む投影処理**（txt2png_over_threshold.py）
+2. **ノイズ除去を含む投影処理**（point2png_over_threshold.py）
 config.tomlにてしきい値を設定。
    - 各ピクセルにthreshold個以上の点がある場合のみ黒く塗る
    - ノイズやポールパーテーションなどの一時的な障害物を除外したい際などに有効
 
-3. **点の密度を可視化**（txt2png_count.py）
+3. **点の密度を可視化**（point2png_count.py）
 点密度ごとに色分け
 config.tomlにて、点の個数の範囲、色が変更可能。
    - 0-4個：薄い色
@@ -108,9 +109,8 @@ config.tomlにて、点の個数の範囲、色が変更可能。
    - 20-29個：最も濃い色
    - 床面の連続性を確認するのに有用
 
-
 ## 6. 処理4 手動編集
-txt2png.py or txt2png_over_threshold.py で出力した黒のpngファイルをベースに、手動で編集。
+point2png.py または point2png_over_threshold.py で出力した黒のpngファイルをベースに、手動で編集。
 make_transparent_png.py で、他のpng画像を半透明にして画像編集ソフトで重ね合わせつつ編集すると楽です。
 
 1. **編集が必要な箇所**
@@ -150,15 +150,172 @@ make2dmap/
 ├── README.md
 ├── clip.py
 ├── config.toml
+├── environments.txt
 ├── make_transparent_png.py
 ├── point2png.py
 ├── point2png_count.py
 └── point2png_over_threshold.py
-
 ```
 
 ## 8. パラメータ設定 config.toml について
 
+プログラムの動作はconfig.tomlファイルで制御されます。まず全体の設定ファイルを示し、その後各プログラムでの設定ポイントを説明します。
+
+### 8.1 config.toml 全体
+```toml
+[general]
+# 全プログラム共通設定
+pixel_size = 0.05
+background_color = "white"
+output_format = "png"
+
+[input_files]
+# 全プログラム共通の入力ファイルパス
+input_file = "data/sample.txt"  # txtファイルでもlasファイルでも共通
+
+[output_files]
+# 各プログラムの出力ファイル名設定
+point2png_output = "output.png"
+point2png_over_threshold_output = "output_threshold.png"
+point2png_count_output = "output_count.png"
+clip_output = "output_clipped"  # 拡張子は入力ファイルと同じになります
+
+[clip]
+# clip.py専用設定
+z_min = 4.8
+z_max = 5.1
+z_column = 2  # Z座標の列番号（0から開始）
+
+[data_format]
+# 全プログラム共通: 空白区切りファイル
+delimiter = "space"
+coordinate_columns = 3  # x, y, z の3列（zは無視、txt2png.pyではx,yのみ使用）
+
+[colors]
+# 全プログラム共通
+point_color = [0, 0, 0]  # 黒色 (R,G,B)
+
+# point2png_over_threshold.py専用: 閾値による色分け
+threshold_count = 20
+below_threshold_color = [255, 255, 255]  # 白色
+above_threshold_color = [0, 0, 0]        # 黒色
+
+# point2png_count.py専用: カウント範囲による色分け
+count_range_1_max = 5
+count_range_1_color = [255, 0, 0]    # 赤色
+
+count_range_2_min = 5
+count_range_2_max = 10
+count_range_2_color = [0, 0, 255]    # 青色
+
+count_range_3_min = 10
+count_range_3_max = 20
+count_range_3_color = [0, 255, 0]    # 緑色
+
+count_range_4_min = 20
+count_range_4_max = 30
+count_range_4_color = [100, 0, 100]  # 紫色
+
+count_range_5_min = 30
+count_range_5_color = [0, 0, 0]      # 黒色
+```
+
+### 8.2 python clip.py での設定ポイント
+
+**必ず調整するパラメータ**:
+```toml
+[input_files]
+input_file = "input.las"  # 処理したいLAS/TXTファイルのパスに変更
+
+[output_files]
+clip_output = "output.las"  # 出力ファイル名を指定
+
+[clip]
+z_min = 0.2  # 抽出する高さの下限
+z_max = 0.4  # 抽出する高さの上限
+z_column = 2 # TXTファイルの場合のZ座標列番号 (x:0,y:1,z:2がデフォかと)
+
+```
+
+### 8.3 python point2png.py での設定ポイント
+
+**必ず変更するパラメータ**:
+```toml
+[input_files]
+input_file = "output_clipped.las"  # 通常はclip.pyの出力ファイル
+
+[output_files]
+point2png_output = "basic_map.png"  # 出力画像ファイル名
+```
+
+**必要な場合に調整するパラメータ**:
+```toml
+[general]
+pixel_size = 0.05  # 1ピクセルあたりの実寸法（メートル）
+
+[colors]
+point_color = [0, 0, 0]  # 点の色（RGB）
+```
+
+**pixel_size**の調整: 0.05 (5cm)が推奨設定。0.02 (2cm)で高解像度、0.1 (10cm)で処理速度重視。
+
+### 8.4 python point2png_over_threshold.py での設定ポイント
+
+**必ず変更するパラメータ**:
+```toml
+[input_files]
+input_file = "output_clipped.las"  # 通常はclip.pyの出力ファイル
+
+[output_files]
+point2png_over_threshold_output = "threshold_map.png"  # 出力画像ファイル名
+
+[colors]
+threshold_count = 20              # 閾値（最重要）
+```
+
+**必要な場合に調整するパラメータ**:
+```toml
+[colors]
+below_threshold_color = [255, 255, 255]  # 閾値未満の色
+above_threshold_color = [0, 0, 0]        # 閾値以上の色
+```
+
+**threshold_count**の調整: 5-10で軽いノイズ除去、20-30で標準設定、50以上で強いノイズ除去。屋内環境では20-30程度、屋外環境では30-50程度が目安。
+
+### 8.5 python point2png_count.py での設定ポイント
+
+**必ず変更するパラメータ**:
+```toml
+[input_files]
+input_file = "output_clipped.las"  # 通常はclip.pyの出力ファイル
+
+[output_files]
+point2png_count_output = "density_map.png"  # 出力画像ファイル名
+```
+
+**必要な場合に調整するパラメータ**:
+```toml
+[colors]
+count_range_1_max = 5
+count_range_1_color = [255, 0, 0]    # 1-4個の点（赤）
+
+count_range_2_min = 5
+count_range_2_max = 10  
+count_range_2_color = [0, 0, 255]    # 5-9個の点（青）
+
+count_range_3_min = 10
+count_range_3_max = 20
+count_range_3_color = [0, 255, 0]    # 10-19個の点（緑）
+
+count_range_4_min = 20
+count_range_4_max = 30
+count_range_4_color = [100, 0, 100]  # 20-29個の点（紫）
+
+count_range_5_min = 30
+count_range_5_color = [0, 0, 0]      # 30個以上（黒）
+```
+
+範囲の調整: データの密度に応じてレンジを変更。点群が密な場合は各レンジを大きく、疎な場合は小さく設定。このプログラムは点密度の分布確認と閾値設定の参考に使用。
 
 
 ## 9. 参考情報
