@@ -12,10 +12,13 @@
 
 ## 2. 環境構築
 
-### 2.1 ソフトウェア
-- **CloudCompare**：点群の可視化と基本的な処理
+### 2.1 おすすめソフトウェア
+どのソフトウェアでも前処理等をおこ
+- **CloudCompare**：床の点群のZ座標を把握するのにGUIでの操作が良いかと
 - **LAStools**：LASファイルの処理とサブサンプリング(最近商用利用有料になった?)
 - **E572LAS**：LAStoolsと同じ会社のソフトウェア
+https://rapidlasso.de/downloads/
+**PDAL**：コマンドで点群の処理がしやすい
 - **画像編集ソフト**：手動編集用（Photoshop、AffinityDesigner等）
 
 ### 2.2 python関連
@@ -32,11 +35,8 @@ e57形式を想定してドキュメントを書きます。
 ### 3.2 データ変換
 1. **e57ファイルの変換**
    - e572lasを使用してe57ファイルをlasに変換
-下記リンクの一番最後のソフトフェア
-https://rapidlasso.de/downloads/
-
-   - matterportから出力したe57ファイルでも変換可
-   基本的な使用方法
+(matterportから出力したe57ファイルでも変換可)
+   e572lasの基本的な使用方法(以下の2種類のどちらでも)
 ①exeファイルを実行し、e57ファイルをドラッグ&ドロップ
 ②コマンドラインで実行　(基本的にはe572lasのパスを通す必要あり)(パスが通ったら以下のリンクのように実行)
 https://downloads.rapidlasso.de/html/e572las_README.html
@@ -68,21 +68,26 @@ https://downloads.rapidlasso.de/html/e572las_README.html
 ![Image](https://github.com/user-attachments/assets/bab417bd-597b-4bb8-ac32-becfed3755f8)
 
 2. **床面高さの決定**
-   - 例：1階 z = 0.02m程度
-   - 例：2階 z = 0m程度（ほぼゼロ）
-   - **注意**：床面は完全に平坦ではない場合が多い
+   - 例：1階床 z = 0.02~0.05程度
+   - **注意**：床面は完全に平坦ではない場合がある
 
 ### 4.2 参照高さ範囲の決定
 
 1. **2D LiDARの高さを考慮**
-   - SLAM用マップの場合：床面 + 177.4mm（LiDAR設置高さ）
-   - 一般的な設定：床面から10cm〜50cm（または70cm）の範囲
+   - SLAM用マップを適用するロボット等がある場合はそのlidarを設置する高さを参照:
+床面高さ+LiDAR設置高さ
+例) 0.03m + 0.2m 
 
 2. **高さ範囲の切り出し**
+切り出す高さはノイズを低減するために数十cm程の範囲を持たせたほうが安定する気がします。
    ```bash
-   # las2las_clip.batの例
-   las2las -i input.las -o output_clipped.las -keep_z 0.1 0.7
+   # las2lasの例
+   las2las -i input.las -o output_clipped.las -keep_z 0.1 0.3
    ```
+
+clip.pyの例
+パラメータはconfig.tomlにて設定
+
 
 ### 4.3 2次元画像への投影
 
@@ -91,11 +96,14 @@ https://downloads.rapidlasso.de/html/e572las_README.html
    - ピクセルサイズ：0.05m（5cm）を推奨
    - 白背景に黒点として描画
 
-2. **ノイズ除去を含む投影処理**（txt2png_30over.py）
-   - 各ピクセルに30個以上の点がある場合のみ黒く塗る
-   - ノイズやポールパーテーションなどの一時的な障害物を除外
+2. **ノイズ除去を含む投影処理**（txt2png_over_threshold.py）
+config.tomlにてしきい値を設定。
+   - 各ピクセルにthreshold個以上の点がある場合のみ黒く塗る
+   - ノイズやポールパーテーションなどの一時的な障害物を除外したい際などに有効
 
 3. **点の密度を可視化**（txt2png_count.py）
+点密度ごとに色分け
+config.tomlにて、点の個数の範囲、色が変更可能。
    - 0-4個：薄い色
    - 5-9個：中間色
    - 10-19個：濃い色
