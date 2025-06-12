@@ -45,7 +45,8 @@ e57形式を想定してドキュメントを書きます。
 
 
 2. **サブサンプリング**（大規模データの場合、必要であれば）
-   *例）cloud compare CLI を使用した場合のコマンド
+
+   *　例）cloud compare CLI を使用した場合のコマンド
    ```bash
    CloudCompare -SILENT -O Shikatou_e572las.las -SS RANDOM 10000000 -C_EXPORT_FMT LAS -SAVE_CLOUDS FILE output10000000.las
    ```
