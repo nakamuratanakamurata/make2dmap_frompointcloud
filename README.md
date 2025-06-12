@@ -179,16 +179,12 @@ python make_transparent_png.py input.png output.png
 ```
 pointcloud-to-map/
 ├── README.md
-├── requirements.txt
-├── scripts/
-│   ├── txt2png.py
-│   ├── txt2png_30over.py
-│   ├── txt2png_count.py
-│   └── make_transparent_png.py
-├── batch/
-│   └── las2las_clip.bat
-└── examples/
-    └── sample_data/
+├── clip.py
+├── point2png.py
+├── point2png_over_threshold.py
+├── point2png_count.py
+└── make_transparent_png.py 
+
 ```
 
 ## 8. 参考情報
